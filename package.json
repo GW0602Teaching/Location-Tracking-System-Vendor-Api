@@ -1,0 +1,18 @@
+{
+  "name": "Location-Tracking-System-Vendor-Api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com-GW0602Teaching:GW0602Teaching/Location-Tracking-System-Vendor-Api.git",
+  "author": "xuyang0602 <wang.xuyang0602@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/util-dynamodb": "^3.418.0",
+    "aws-sdk": "^2.1464.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.122",
+    "@types/node": "^20.7.0",
+    "typescript": "^5.2.2"
+  }
+}
