@@ -177,6 +177,7 @@ export const dynamoDbRemoveConnection = async (
 
 // execRemoveConnection();
 
+// Remove Message from SQS
 export const sqsDeleteMessage = async (
   queueUrl: string,
   receiptHandle: string
@@ -199,14 +200,65 @@ export const sqsDeleteMessage = async (
   }
 };
 
-const execSqsDeleteMessage = async () => {
-  const receiptHandle =
-    'AQEBo8WLWoDJdh0kFyg6bzezPWH7ND1c6ND1BBbGwObaQXsbj9u2f989XZc4lvn3NAu3YylIaTBmdV3mDRMsc+nJ4LKg4Rq67/zsiwFbhTcnKlpaN47EUE7+Jk44F1tnlFvotgWRPkXiAHf6rMqP+g+fQK4GWyUktOkydkEj6etqJcQajDhsiUtMTTINF/XgYLbN8NjGMtFE9O+C3SLFqejadMlhOI/NnlPLES0VVDAQ+dQoCpbgnQIqMsef7GTBDZbJ8nF16uzDWrh67YQVRgltEB5+WWCLDZVgcFTqHr59a16gwzD8UV4sOEha7R7YDVNRt+IqxZ5f6z4CCDt8TsCP8D8i8oOctgcjHI++PyQ8Fsh6yiQ6KI8SJUtvuxSlGzXr6XVmCSO49yBzw8LCnUdZCQ==';
-  const res = await sqsDeleteMessage(
-    'https://sqs.us-east-1.amazonaws.com/525480118775/vender-twitter-queue',
-    receiptHandle
-  );
-  console.log(res);
-};
+// const execSqsDeleteMessage = async () => {
+//   const receiptHandle =
+//     'AQEBo8WLWoDJdh0kFyg6bzezPWH7ND1c6ND1BBbGwObaQXsbj9u2f989XZc4lvn3NAu3YylIaTBmdV3mDRMsc+nJ4LKg4Rq67/zsiwFbhTcnKlpaN47EUE7+Jk44F1tnlFvotgWRPkXiAHf6rMqP+g+fQK4GWyUktOkydkEj6etqJcQajDhsiUtMTTINF/XgYLbN8NjGMtFE9O+C3SLFqejadMlhOI/NnlPLES0VVDAQ+dQoCpbgnQIqMsef7GTBDZbJ8nF16uzDWrh67YQVRgltEB5+WWCLDZVgcFTqHr59a16gwzD8UV4sOEha7R7YDVNRt+IqxZ5f6z4CCDt8TsCP8D8i8oOctgcjHI++PyQ8Fsh6yiQ6KI8SJUtvuxSlGzXr6XVmCSO49yBzw8LCnUdZCQ==';
+//   const res = await sqsDeleteMessage(
+//     'https://sqs.us-east-1.amazonaws.com/525480118775/vender-twitter-queue',
+//     receiptHandle
+//   );
+//   console.log(res);
+// };
 
-execSqsDeleteMessage();
+// execSqsDeleteMessage();
+
+// Broadcast Message
+interface BroadcastMessageWebsocketProps {
+  apiGateway: AWS.ApiGatewayManagementApi;
+  connections: any[];
+  message: string;
+  tableName: string;
+}
+
+export const broadcastMessageWebsocket = async (
+  props: BroadcastMessageWebsocketProps
+) => {
+  const { apiGateway, connections, message, tableName } = props;
+  const sendVendorsCall = connections?.map(async (connection) => {
+    const { connectionId } = connection;
+    try {
+      await apiGateway
+        .postToConnection({
+          ConnectionId: connectionId,
+          Data: message,
+        })
+        .promise();
+    } catch (e) {
+      if ((e as any).statusCode === 410) {
+        // stale connection
+        console.log(`delete stale connection: ${connectionId}`);
+        const removeConnRes = await dynamoDbRemoveConnection(
+          tableName,
+          connectionId
+        );
+        if (removeConnRes instanceof Error) {
+          return e;
+        }
+      } else {
+        return e;
+      }
+    }
+  });
+
+  try {
+    const res = await Promise.all(sendVendorsCall);
+    return res;
+  } catch (e) {
+    if (e instanceof Error) {
+      return e;
+    }
+    return new Error(
+      `broadcastMessageWebsocket error object unknown type`
+    );
+  }
+};
