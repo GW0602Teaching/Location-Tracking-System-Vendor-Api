@@ -59,7 +59,8 @@ export const handler = async (
         Items: iterator.value.Items,
         count: iterator.value.Count,
         lastEvaluatedKey: iterator.value.LastEvaluatedKey
-          ? unmarshall(iterator.value.LastEvaluatedKey)
+          ? //   ? unmarshall(iterator.value.LastEvaluatedKey)
+            iterator.value.LastEvaluatedKey
           : null,
       }),
     };
