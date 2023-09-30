@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "lambda_ws" {
         "arn:aws:sqs:${var.aws_region}:${local.account_id}:${var.sqs_queue_name}",
         "arn:aws:dynamodb:${var.aws_region}:${local.account_id}:table/${var.websocket_table_name}",
         "arn:aws:dynamodb:${var.aws_region}:${local.account_id}:table/${var.vendor_table_name}",
-        # api gateway, will add it after we create out api gateway through terraform
+        "${aws_apigatewayv2_api.websocket_gw.execution_arn}/*"
       ]
     }
 }
