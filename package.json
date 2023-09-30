@@ -5,9 +5,6 @@
   "repository": "git@github.com-GW0602Teaching:GW0602Teaching/Location-Tracking-System-Vendor-Api.git",
   "author": "xuyang0602 <wang.xuyang0602@gmail.com>",
   "license": "MIT",
-  "scripts": {
-    "start": "node \"build/aws.js\""
-  },
   "dependencies": {
     "@aws-sdk/util-dynamodb": "^3.418.0",
     "aws-sdk": "^2.1464.0",

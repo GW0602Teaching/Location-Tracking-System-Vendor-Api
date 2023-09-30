@@ -1,5 +1,6 @@
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import AWS from 'aws-sdk';
+import { AttributeValue } from 'aws-sdk/clients/dynamodb';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -55,7 +56,7 @@ export const dynamodbScanTable = async function* (
 
       lastEvaluatedKey = (result as AWS.DynamoDB.ScanOutput)
         .LastEvaluatedKey;
-      result.Items = result.Items?.map((item) => unmarshall(item));
+      result.Items = result.Items?.map((item) => item);
       yield result;
     } catch (e) {
       if (e instanceof Error) {
@@ -235,7 +236,7 @@ export const broadcastMessageWebsocket = async (
         .promise();
     } catch (e) {
       if ((e as any).statusCode === 410) {
-        // stale connection
+        // steel connection
         console.log(`delete stale connection: ${connectionId}`);
         const removeConnRes = await dynamoDbRemoveConnection(
           tableName,
