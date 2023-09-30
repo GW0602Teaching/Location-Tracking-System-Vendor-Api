@@ -40,7 +40,7 @@ resource "aws_lambda_permission" "disconnect_permission" {
     function_name = aws_lambda_function.disconnect.function_name
     principal = "apigateway.amazonaws.com"
     source_arn = "${aws_apigatewayv2_api.websocket_gw.execution_arn}/*/*"
-
+}
 
 # sendvendor
 resource "aws_lambda_function" "sendvendor" {
