@@ -2,7 +2,7 @@ name: 'Terraform action'
 on:
   push:
     branches:
-      - 2_db_connection
+      - 13_tf_lambda
   pull_request:
 permissions:
   id-token: write # This is required for aws oidc connections (Try 4)
@@ -26,77 +26,77 @@ jobs:
           role-session-name: ${{ secrets.AWS_OIDC_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      # - name: Build connect ECR
-      #   uses: int128/create-ecr-repository-action@v1
-      #   id: connect-ecr
-      #   with:
-      #     repository: ${{ secrets.AWS_ECR_NAME_CONNECT }}
+      - name: Build connect ECR
+        uses: int128/create-ecr-repository-action@v1
+        id: connect-ecr
+        with:
+          repository: ${{ secrets.AWS_ECR_NAME_CONNECT }}
 
-      # - name: Build, tag, and push connect image to Amazon ECR
-      #   id: build-image-connect
-      #   env:
-      #     AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     AWS_IMAGE_TAG: ${{ github.sha }}
-      #     AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_CONNECT }}
-      #   run: |
-      #     docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
-      #     docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
-      #     echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
+      - name: Build, tag, and push connect image to Amazon ECR
+        id: build-image-connect
+        env:
+          AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          AWS_IMAGE_TAG: ${{ github.sha }}
+          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_CONNECT }}
+        run: |
+          docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
+          docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
+          echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
 
-      # - name: Build disconnect ECR
-      #   uses: int128/create-ecr-repository-action@v1
-      #   id: disconnect-ecr
-      #   with:
-      #     repository: ${{ secrets.AWS_ECR_NAME_DISCONNECT }}
+      - name: Build disconnect ECR
+        uses: int128/create-ecr-repository-action@v1
+        id: disconnect-ecr
+        with:
+          repository: ${{ secrets.AWS_ECR_NAME_DISCONNECT }}
 
-      # - name: Build, tag, and push disconnect image to Amazon ECR
-      #   id: build-image-disconnect
-      #   env:
-      #     AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     AWS_IMAGE_TAG: ${{ github.sha }}
-      #     AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_DISCONNECT }}
-      #   run: |
-      #     docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
-      #     docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
-      #     echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
+      - name: Build, tag, and push disconnect image to Amazon ECR
+        id: build-image-disconnect
+        env:
+          AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          AWS_IMAGE_TAG: ${{ github.sha }}
+          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_DISCONNECT }}
+        run: |
+          docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
+          docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
+          echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
 
-      # - name: Build sendvendor ECR
-      #   uses: int128/create-ecr-repository-action@v1
-      #   id: sendvendor-ecr
-      #   with:
-      #     repository: ${{ secrets.AWS_ECR_NAME_SENDVENDOR }}
+      - name: Build sendvendor ECR
+        uses: int128/create-ecr-repository-action@v1
+        id: sendvendor-ecr
+        with:
+          repository: ${{ secrets.AWS_ECR_NAME_SENDVENDOR }}
 
-      # - name: Build, tag, and push sendvendor image to Amazon ECR
-      #   id: build-image-sendvendor
-      #   env:
-      #     AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     AWS_IMAGE_TAG: ${{ github.sha }}
-      #     AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_SENDVENDOR }}
-      #   run: |
-      #     docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
-      #     docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
-      #     echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
+      - name: Build, tag, and push sendvendor image to Amazon ECR
+        id: build-image-sendvendor
+        env:
+          AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          AWS_IMAGE_TAG: ${{ github.sha }}
+          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_SENDVENDOR }}
+        run: |
+          docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
+          docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
+          echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
 
-      # - name: Build getvendors ECR
-      #   uses: int128/create-ecr-repository-action@v1
-      #   id: getvendors-ecr
-      #   with:
-      #     repository: ${{ secrets.AWS_ECR_NAME_GETVENDORS }}
+      - name: Build getvendors ECR
+        uses: int128/create-ecr-repository-action@v1
+        id: getvendors-ecr
+        with:
+          repository: ${{ secrets.AWS_ECR_NAME_GETVENDORS }}
 
-      # - name: Build, tag, and push getvendors image to Amazon ECR
-      #   id: build-image-getvendors
-      #   env:
-      #     AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     AWS_IMAGE_TAG: ${{ github.sha }}
-      #     AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_GETVENDORS }}
-      #   run: |
-      #     docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
-      #     docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
-      #     echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
+      - name: Build, tag, and push getvendors image to Amazon ECR
+        id: build-image-getvendors
+        env:
+          AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          AWS_IMAGE_TAG: ${{ github.sha }}
+          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_NAME_GETVENDORS }}
+        run: |
+          docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG --target $AWS_ECR_REPOSITORY .
+          docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG
+          echo "::set-output name=image::$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:$AWS_IMAGE_TAG"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -182,7 +182,7 @@ jobs:
       - name: Terraform Apply
         id: apply
         working-directory: ./terraform
-        if: github.ref == 'refs/heads/2_db_connection' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/13_tf_lambda' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
         env:
           TF_VAR_image_tag: ${{ github.sha }}
